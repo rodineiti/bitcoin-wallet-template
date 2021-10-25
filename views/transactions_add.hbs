@@ -1,0 +1,89 @@
+<main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+  <div
+    class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom"
+  >
+    <h1>Add transaction</h1>
+
+  </div>
+  <div class="row">
+    <div class="col">
+      <div class="row">
+        <div class="col text-end">
+          <span class="badge bg-success">Current price bitcoin:
+            {{bitcoinBuy}}</span>
+        </div>
+      </div>
+      <hr />
+      <div class="row">
+        <div class="col-3">
+          <form
+            id="form-transaction"
+            method="post"
+            action="/transactions/store"
+          >
+            <div class="mb-3">
+              <label for="amount" class="form-label">Value</label>
+              <input
+                type="number"
+                class="form-control"
+                id="amount"
+                name="amount"
+                required
+              />
+            </div>
+            <div class="mb-3">
+              <label for="created_at" class="form-label">Date</label>
+              <input
+                type="date"
+                class="form-control"
+                id="created_at"
+                name="created_at"
+                required
+              />
+            </div>
+            <div class="mb-3">
+              <label for="priceBitcoin" class="form-label">Price bitcoin</label>
+              <div class="input-group">
+                <input
+                  type="number"
+                  class="form-control"
+                  id="priceBitcoin"
+                  name="priceBitcoin"
+                  required
+                />
+                <button
+                  type="button"
+                  id="loading-price"
+                  class="btn btn-info input-group-text"
+                >Loading price</button>
+              </div>
+            </div>
+            <div class="mb-3">
+              <label for="qtyBitcoin" class="form-label">Qty bitcoin</label>
+              <input
+                type="number"
+                class="form-control"
+                id="qtyBitcoin"
+                name="qtyBitcoin"
+                readonly
+                disabled
+                required
+              />
+            </div>
+            <button
+              type="submit"
+              id="btn-submit"
+              class="btn btn-primary"
+            >Submit</button>
+
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+  var rootURL = "{{rootURL}}";
+</script>
+<script src="{{rootURL}}/js/transaction.js"></script>
