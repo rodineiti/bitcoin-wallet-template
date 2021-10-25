@@ -7,21 +7,23 @@
   </div>
 
   <div class="row">
-    <div class="col-4">
+    <div class="col-3">
       <div class="card">
         <div class="card-body">
           <h5 class="card-title">Amount invested</h5>
-          <span
-            class="badge rounded-pill bg-success"
-          >{{transactionSum.amount}}</span>
+          <h1
+            class="card-title text-center bg-info text-white p-4"
+          >{{transactionSum.amount}}</h1>
         </div>
       </div>
     </div>
-    <div class="col-4">
+    <div class="col-5">
       <div class="card">
         <div class="card-body">
           <h5 class="card-title">Amount bitcoins</h5>
-          <span class="badge rounded-pill bg-info">{{transactionSum.qty}}</span>
+          <h1
+            class="card-title text-center bg-success text-white p-4"
+          >{{transactionSum.qty}}</h1>
         </div>
       </div>
     </div>
@@ -29,7 +31,9 @@
       <div class="card">
         <div class="card-body">
           <h5 class="card-title">Current value bitcoin</h5>
-          <span class="badge rounded-pill bg-warning">{{bitcoinBuy}}</span>
+          <h1
+            class="card-title text-center bg-warning text-white p-4"
+          >{{bitcoinBuy}}</h1>
         </div>
       </div>
     </div>
@@ -39,5 +43,6 @@
 
 </main>
 <script>
-  let transactions = decodeURIComponent("{{{transactions}}}");
+  let transactions = decodeURIComponent("{{{transactions}}}"); let
+  transactionsCompare = decodeURIComponent("{{{transactionsCompare}}}");
 </script>

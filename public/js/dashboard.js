@@ -6,15 +6,7 @@
   feather.replace({ "aria-hidden": "true" });
 
   transactions = JSON.parse(transactions);
-
-  console.log(
-    transactions.map(
-      (item) =>
-        `${new Date(item.created_at).getFullYear()}-${
-          new Date(item.created_at).getMonth() + 1
-        }-${new Date(item.created_at).getDate()}`
-    )
-  );
+  transactionsCompare = JSON.parse(transactionsCompare);
 
   // Graphs
   var ctx = document.getElementById("myChart");
@@ -31,12 +23,24 @@
         ),
         datasets: [
           {
+            label: "Lucro",
+            fill: false,
             data: transactions.map((item) => item.qty),
             lineTension: 0,
             backgroundColor: "transparent",
             borderColor: "#007bff",
             borderWidth: 4,
             pointBackgroundColor: "#007bff",
+          },
+          {
+            label: "Perda",
+            fill: false,
+            data: transactionsCompare.map((item) => item.qty),
+            lineTension: 0,
+            backgroundColor: "transparent",
+            borderColor: "#FF0000",
+            borderWidth: 4,
+            pointBackgroundColor: "#FF0000",
           },
         ],
       },
@@ -51,7 +55,7 @@
           ],
         },
         legend: {
-          display: false,
+          display: true,
         },
       },
     });

@@ -5,7 +5,11 @@ const {
   isAuthenticate,
 } = require("../middlewares/authMiddleware");
 const { connect } = require("../db");
-const { formatDate, formatDateBR } = require("../helpers/helpers");
+const {
+  formatDate,
+  formatDateBR,
+  calculateBitcoin,
+} = require("../helpers/helpers");
 
 const router = express.Router();
 
@@ -48,10 +52,7 @@ router.get("/dashboard", authMiddleware, async (request, response) => {
 
     const { ticker } = data.data;
 
-    let bitcoinBuy = new Intl.NumberFormat("pt-BR", {
-      style: "currency",
-      currency: "BRL",
-    }).format(ticker?.buy);
+    let bitcoinBuy = ticker?.buy;
 
     const connection = await connect();
 
@@ -61,14 +62,33 @@ router.get("/dashboard", authMiddleware, async (request, response) => {
     );
 
     const [rows] = await connection.query(
-      `SELECT created_at, qty FROM transactions WHERE user_id  = ? ORDER BY created_at ASC`,
+      `SELECT created_at, qty, amount FROM transactions WHERE user_id  = ? ORDER BY created_at ASC`,
       [request.session.userid]
     );
 
+    const transactionsCompare = rows.map((item) => {
+      return {
+        ...item,
+        qty: calculateBitcoin(item.amount, bitcoinBuy),
+      };
+    });
+
     return response.render("dashboard", {
-      transactionSum: row,
-      bitcoinBuy,
+      transactionSum: {
+        ...row,
+        amount: new Intl.NumberFormat("pt-BR", {
+          style: "currency",
+          currency: "BRL",
+        }).format(row.amount),
+      },
+      bitcoinBuy: new Intl.NumberFormat("pt-BR", {
+        style: "currency",
+        currency: "BRL",
+      }).format(bitcoinBuy),
       transactions: encodeURIComponent(JSON.stringify(rows)),
+      transactionsCompare: encodeURIComponent(
+        JSON.stringify(transactionsCompare)
+      ),
     });
   } catch (error) {}
 });
