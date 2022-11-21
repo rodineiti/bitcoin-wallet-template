@@ -57,7 +57,7 @@ router.post("/update", async (request, response) => {
 
         await connection.query(
           `UPDATE users SET name = ?, email = ?, password = ? WHERE id = ?`,
-          [name, email, password, row.id]
+          [name, email, hashPassword, row.id]
         );
 
         session.message = "Congratulations, updated with successfully";
