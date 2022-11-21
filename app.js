@@ -5,6 +5,13 @@ const cookieParser = require("cookie-parser");
 const session = require("express-session");
 const exphbs = require("express-handlebars");
 dotenv.config({ path: "./.env" });
+
+/**
+ * Run Migrations
+ */
+const runMigrations = require("./src/database/sqlite/migrations");
+runMigrations();
+
 const app = express();
 const publicDirectory = path.join(__dirname, "./public");
 app.use(express.static(publicDirectory));

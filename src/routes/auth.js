@@ -26,14 +26,13 @@ router.post("/login", async (request, response) => {
     try {
       const connection = await connect();
 
-      const [[row]] = await connection.query(
+      const row = await connection.get(
         `SELECT * FROM users WHERE email = ? LIMIT 1`,
         [email]
       );
 
       if (row) {
         if (!bcrypt.compareSync(password, row.password)) {
-          console.log("error compare");
           session.message = "Could not find a user with these credentials";
           response.redirect("/");
           return;
@@ -65,15 +64,15 @@ router.post("/register", async (request, response) => {
     try {
       const connection = await connect();
 
-      const [row] = await connection.query(
+      const row = await connection.get(
         `SELECT * FROM users WHERE email = ? LIMIT 1`,
         [email]
       );
 
-      if (!row.length) {
+      if (!row) {
         let hashPassword = await bcrypt.hash(password, 8);
 
-        await connection.query(
+        await connection.run(
           `INSERT INTO users (name, email, password) VALUES (?, ?, ?)`,
           [name, email, hashPassword]
         );
@@ -102,7 +101,7 @@ router.post("/forgot", async (request, response) => {
     try {
       const connection = await connect();
 
-      const [[row]] = await connection.query(
+      const row = await connection.get(
         `SELECT * FROM users WHERE email = ? LIMIT 1`,
         [email]
       );
@@ -110,10 +109,10 @@ router.post("/forgot", async (request, response) => {
       if (row) {
         const token = `${new Date().getTime()}-${new Date().getTime() + 10}`;
 
-        await connection.query(
-          `UPDATE users SET token_forget = ? WHERE id = ?`,
-          [token, row.id]
-        );
+        await connection.run(`UPDATE users SET token_forget = ? WHERE id = ?`, [
+          token,
+          row.id
+        ]);
 
         let link = `http://localhost:9009/reset?token=${token}`;
 
@@ -152,7 +151,7 @@ router.post("/reset", async (request, response) => {
     try {
       const connection = await connect();
 
-      const [[row]] = await connection.query(
+      const row = await connection.get(
         `SELECT * FROM users WHERE token_forget = ? LIMIT 1`,
         [token]
       );
@@ -160,7 +159,7 @@ router.post("/reset", async (request, response) => {
       if (row) {
         let hashPassword = await bcrypt.hash(password, 8);
 
-        await connection.query(
+        await connection.run(
           `UPDATE users SET token_forget = null, password = ? WHERE id = ?`,
           [hashPassword, row.id]
         );

@@ -15,7 +15,7 @@ router.post("/store", async (request, response) => {
 
       const qty = calculateBitcoin(amount, priceBitcoin);
 
-      await connection.query(
+      await connection.run(
         `INSERT INTO transactions (amount, qty, priceBitcoin, created_at, user_id) VALUES (?, ?, ?, ?, ?)`,
         [
           parseFloat(amount),
@@ -46,7 +46,7 @@ router.post("/update", async (request, response) => {
     try {
       const connection = await connect();
 
-      const [[row]] = await connection.query(
+      const row = await connection.get(
         `SELECT * FROM transactions WHERE id = ? AND user_id = ? LIMIT 1`,
         [id, session.userid]
       );
@@ -54,7 +54,7 @@ router.post("/update", async (request, response) => {
       if (row) {
         const qty = calculateBitcoin(amount, priceBitcoin);
 
-        await connection.query(
+        await connection.run(
           `UPDATE transactions SET amount = ?, qty = ?, priceBitcoin = ? WHERE id = ? AND user_id = ?`,
           [amount, qty, priceBitcoin, row.id, session.userid]
         );

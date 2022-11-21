@@ -13,7 +13,7 @@ router.post("/login", async (request, response) => {
     try {
       const connection = await connect();
 
-      const [[row]] = await connection.query(
+      const row = await connection.get(
         `SELECT * FROM users WHERE email = ? LIMIT 1`,
         [email]
       );

@@ -1,11 +1,16 @@
-const mysql = require("mysql2/promise");
+const sqlite3 = require("sqlite3");
+const sqlite = require("sqlite");
+const path = require("path");
 
 exports.connect = async () => {
-  if (global.connection && global.connection.state !== "disconnected")
-    return global.connection;
+  const connection = await sqlite.open({
+    filename: path.resolve(__dirname, "database", "database.sqlite"),
+    driver: sqlite3.Database
+  });
 
-  const connection = await mysql.createConnection(process.env.BATABASE_URL);
-  console.log("Conected to MySQL!");
-  global.connection = connection;
+  await connection.run("PRAGMA foreign_keys = ON");
+
+  console.log("Sqlite Connected");
+
   return connection;
 };

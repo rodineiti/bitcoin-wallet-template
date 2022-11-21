@@ -12,15 +12,15 @@ router.post("/store", async (request, response) => {
     try {
       const connection = await connect();
 
-      const [row] = await connection.query(
+      const row = await connection.get(
         `SELECT * FROM users WHERE email = ? LIMIT 1`,
         [email]
       );
 
-      if (!row.length) {
+      if (!row) {
         let hashPassword = await bcrypt.hash(password, 8);
 
-        await connection.query(
+        await connection.run(
           `INSERT INTO users (name, email, password) VALUES (?, ?, ?)`,
           [name, email, hashPassword]
         );
@@ -47,7 +47,7 @@ router.post("/update", async (request, response) => {
     try {
       const connection = await connect();
 
-      const [[row]] = await connection.query(
+      const row = await connection.get(
         `SELECT * FROM users WHERE id = ? LIMIT 1`,
         [id]
       );
@@ -55,9 +55,9 @@ router.post("/update", async (request, response) => {
       if (row) {
         let hashPassword = await bcrypt.hash(password, 8);
 
-        await connection.query(
+        await connection.run(
           `UPDATE users SET name = ?, email = ?, password = ? WHERE id = ?`,
-          [name, email, password, row.id]
+          [name, email, hashPassword, row.id]
         );
 
         session.message = "Congratulations, updated with successfully";

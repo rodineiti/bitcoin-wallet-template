@@ -50,12 +50,12 @@ router.get("/dashboard", authMiddleware, async (request, response) => {
 
     const connection = await connect();
 
-    const [[row]] = await connection.query(
+    const row = await connection.get(
       `SELECT sum(amount) as amount, sum(qty) as qty FROM transactions WHERE user_id  = ? LIMIT 1`,
       [request.session.userid]
     );
 
-    const [rows] = await connection.query(
+    const rows = await connection.all(
       `SELECT created_at, qty, amount FROM transactions WHERE user_id  = ? ORDER BY created_at ASC`,
       [request.session.userid]
     );
@@ -96,7 +96,7 @@ router.get("/transactions", authMiddleware, async (request, response) => {
 
     const connection = await connect();
 
-    const [rows] = await connection.query(
+    const rows = await connection.all(
       `SELECT * FROM transactions WHERE user_id  = ? ORDER BY created_at ASC`,
       [userid]
     );
@@ -144,7 +144,7 @@ router.get("/transactions/edit", authMiddleware, async (request, response) => {
 
     const connection = await connect();
 
-    const [[row]] = await connection.query(
+    const row = await connection.get(
       `SELECT * FROM transactions WHERE id = ? AND user_id = ? LIMIT 1`,
       [id, request.session.userid]
     );
@@ -170,7 +170,7 @@ router.get("/transactions/del", authMiddleware, async (request, response) => {
   try {
     const connection = await connect();
 
-    await connection.query(
+    await connection.run(
       `DELETE FROM transactions WHERE id = ? AND user_id = ?`,
       [id, session.userid]
     );
@@ -194,7 +194,9 @@ router.get("/users", authMiddleware, async (request, response) => {
       currency: "BRL"
     }).format(bitcoinBuy);
 
-    const [rows] = await connection.query(
+    const connection = await connect();
+
+    const rows = await connection.all(
       `SELECT * FROM users ORDER BY created_at ASC`
     );
 
@@ -243,7 +245,7 @@ router.get("/users/edit", authMiddleware, async (request, response) => {
 
     const connection = await connect();
 
-    const [[row]] = await connection.query(
+    const row = await connection.get(
       `SELECT * FROM users WHERE id = ? LIMIT 1`,
       [id]
     );
@@ -269,7 +271,7 @@ router.get("/users/del", authMiddleware, async (request, response) => {
   try {
     const connection = await connect();
 
-    await connection.query(`DELETE FROM users WHERE id = ?`, [id]);
+    await connection.run(`DELETE FROM users WHERE id = ?`, [id]);
 
     session.message = "User deleted";
 
