@@ -14,7 +14,7 @@ router.post("/login", async (request, response) => {
       const connection = await connect();
 
       const [[row]] = await connection.query(
-        `SELECT * FROM users WHERE email = ?`,
+        `SELECT * FROM users WHERE email = ? LIMIT 1`,
         [email]
       );
 
@@ -28,7 +28,7 @@ router.post("/login", async (request, response) => {
           { userid: row.id, email: row.email },
           process.env.JWT_SECRET,
           {
-            expiresIn: "1h",
+            expiresIn: "1h"
           }
         );
 

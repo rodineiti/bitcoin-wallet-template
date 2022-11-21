@@ -51,7 +51,7 @@ router.get("/dashboard", authMiddleware, async (request, response) => {
     const connection = await connect();
 
     const [[row]] = await connection.query(
-      `SELECT sum(amount) as amount, sum(qty) as qty FROM transactions WHERE user_id  = ?`,
+      `SELECT sum(amount) as amount, sum(qty) as qty FROM transactions WHERE user_id  = ? LIMIT 1`,
       [request.session.userid]
     );
 
@@ -145,7 +145,7 @@ router.get("/transactions/edit", authMiddleware, async (request, response) => {
     const connection = await connect();
 
     const [[row]] = await connection.query(
-      `SELECT * FROM transactions WHERE id = ? AND user_id = ?`,
+      `SELECT * FROM transactions WHERE id = ? AND user_id = ? LIMIT 1`,
       [id, request.session.userid]
     );
 
@@ -243,9 +243,10 @@ router.get("/users/edit", authMiddleware, async (request, response) => {
 
     const connection = await connect();
 
-    const [[row]] = await connection.query(`SELECT * FROM users WHERE id = ?`, [
-      id
-    ]);
+    const [[row]] = await connection.query(
+      `SELECT * FROM users WHERE id = ? LIMIT 1`,
+      [id]
+    );
 
     const newData = {
       ...row,

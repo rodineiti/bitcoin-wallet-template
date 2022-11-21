@@ -47,7 +47,7 @@ router.post("/update", async (request, response) => {
       const connection = await connect();
 
       const [[row]] = await connection.query(
-        `SELECT * FROM transactions WHERE id = ? AND user_id = ?`,
+        `SELECT * FROM transactions WHERE id = ? AND user_id = ? LIMIT 1`,
         [id, session.userid]
       );
 

@@ -13,7 +13,7 @@ router.post("/store", async (request, response) => {
       const connection = await connect();
 
       const [row] = await connection.query(
-        `SELECT * FROM users WHERE email = ?`,
+        `SELECT * FROM users WHERE email = ? LIMIT 1`,
         [email]
       );
 
@@ -48,7 +48,7 @@ router.post("/update", async (request, response) => {
       const connection = await connect();
 
       const [[row]] = await connection.query(
-        `SELECT * FROM users WHERE id = ?`,
+        `SELECT * FROM users WHERE id = ? LIMIT 1`,
         [id]
       );
 

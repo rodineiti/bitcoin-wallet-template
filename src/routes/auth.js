@@ -27,7 +27,7 @@ router.post("/login", async (request, response) => {
       const connection = await connect();
 
       const [[row]] = await connection.query(
-        `SELECT * FROM users WHERE email = ?`,
+        `SELECT * FROM users WHERE email = ? LIMIT 1`,
         [email]
       );
 
@@ -66,7 +66,7 @@ router.post("/register", async (request, response) => {
       const connection = await connect();
 
       const [row] = await connection.query(
-        `SELECT * FROM users WHERE email = ?`,
+        `SELECT * FROM users WHERE email = ? LIMIT 1`,
         [email]
       );
 
@@ -103,7 +103,7 @@ router.post("/forgot", async (request, response) => {
       const connection = await connect();
 
       const [[row]] = await connection.query(
-        `SELECT * FROM users WHERE email = ?`,
+        `SELECT * FROM users WHERE email = ? LIMIT 1`,
         [email]
       );
 
@@ -153,7 +153,7 @@ router.post("/reset", async (request, response) => {
       const connection = await connect();
 
       const [[row]] = await connection.query(
-        `SELECT * FROM users WHERE token_forget = ?`,
+        `SELECT * FROM users WHERE token_forget = ? LIMIT 1`,
         [token]
       );
 
