@@ -1,15 +1,15 @@
-const { default: axios } = require("axios");
 const express = require("express");
 const {
   authMiddleware,
-  isAuthenticate,
+  isAuthenticate
 } = require("../middlewares/authMiddleware");
 const { connect } = require("../db");
 const {
   formatDate,
   formatDateBR,
-  calculateBitcoin,
+  calculateBitcoin
 } = require("../helpers/helpers");
+const { getBuy } = require("../helpers/bitcoin");
 
 const router = express.Router();
 
@@ -46,13 +46,7 @@ router.get("/reset", isAuthenticate, (request, response) => {
 
 router.get("/dashboard", authMiddleware, async (request, response) => {
   try {
-    const data = await axios.get(
-      "https://www.mercadobitcoin.net/api/BTC/ticker/"
-    );
-
-    const { ticker } = data.data;
-
-    let bitcoinBuy = ticker?.buy;
+    let bitcoinBuy = await getBuy();
 
     const connection = await connect();
 
@@ -66,29 +60,30 @@ router.get("/dashboard", authMiddleware, async (request, response) => {
       [request.session.userid]
     );
 
-    const transactionsCompare = rows.map((item) => {
+    const transactionsCompare = rows.map(item => {
       return {
         ...item,
-        qty: calculateBitcoin(item.amount, bitcoinBuy),
+        qty: calculateBitcoin(item.amount, bitcoinBuy)
       };
     });
 
     return response.render("dashboard", {
       transactionSum: {
         ...row,
+        qty: row?.qty || 0,
         amount: new Intl.NumberFormat("pt-BR", {
           style: "currency",
-          currency: "BRL",
-        }).format(row.amount),
+          currency: "BRL"
+        }).format(row.amount)
       },
       bitcoinBuy: new Intl.NumberFormat("pt-BR", {
         style: "currency",
-        currency: "BRL",
+        currency: "BRL"
       }).format(bitcoinBuy),
       transactions: encodeURIComponent(JSON.stringify(rows)),
       transactionsCompare: encodeURIComponent(
         JSON.stringify(transactionsCompare)
-      ),
+      )
     });
   } catch (error) {}
 });
@@ -97,13 +92,7 @@ router.get("/transactions", authMiddleware, async (request, response) => {
   const { message, userid } = request.session;
 
   try {
-    const data = await axios.get(
-      "https://www.mercadobitcoin.net/api/BTC/ticker/"
-    );
-
-    const { ticker } = data.data;
-
-    let bitcoinBuy = ticker?.buy;
+    let bitcoinBuy = await getBuy();
 
     const connection = await connect();
 
@@ -112,36 +101,32 @@ router.get("/transactions", authMiddleware, async (request, response) => {
       [userid]
     );
 
-    const transactions = rows.map((item) => ({
+    const transactions = rows.map(item => ({
       ...item,
       created_at: formatDateBR(item.created_at),
-      compare: item.priceBitcoin > bitcoinBuy ? false : true,
+      compare: item.priceBitcoin > bitcoinBuy ? false : true
     }));
 
     return response.render("transactions", {
       message,
       bitcoinBuy: new Intl.NumberFormat("pt-BR", {
         style: "currency",
-        currency: "BRL",
+        currency: "BRL"
       }).format(bitcoinBuy),
-      transactions,
+      transactions
     });
   } catch (error) {
-    console.log(error);
+    console.error(error);
   }
 });
 
 router.get("/transactions/add", authMiddleware, async (request, response) => {
-  const data = await axios.get(
-    "https://www.mercadobitcoin.net/api/BTC/ticker/"
-  );
+  let bitcoinBuy = await getBuy();
 
-  const { ticker } = data.data;
-
-  let bitcoinBuy = new Intl.NumberFormat("pt-BR", {
+  bitcoinBuy = new Intl.NumberFormat("pt-BR", {
     style: "currency",
-    currency: "BRL",
-  }).format(ticker?.buy);
+    currency: "BRL"
+  }).format(bitcoinBuy);
 
   response.render("transactions_add", { bitcoinBuy });
 });
@@ -150,16 +135,12 @@ router.get("/transactions/edit", authMiddleware, async (request, response) => {
   const { id } = request.query;
 
   try {
-    const data = await axios.get(
-      "https://www.mercadobitcoin.net/api/BTC/ticker/"
-    );
+    let bitcoinBuy = await getBuy();
 
-    const { ticker } = data.data;
-
-    let bitcoinBuy = new Intl.NumberFormat("pt-BR", {
+    bitcoinBuy = new Intl.NumberFormat("pt-BR", {
       style: "currency",
-      currency: "BRL",
-    }).format(ticker?.buy);
+      currency: "BRL"
+    }).format(bitcoinBuy);
 
     const connection = await connect();
 
@@ -170,15 +151,15 @@ router.get("/transactions/edit", authMiddleware, async (request, response) => {
 
     const newData = {
       ...row,
-      created_at: formatDate(row.created_at),
+      created_at: formatDate(row.created_at)
     };
 
     return response.render("transactions_edit", {
       bitcoinBuy,
-      transaction: newData,
+      transaction: newData
     });
   } catch (error) {
-    console.log(error);
+    console.error(error);
   }
 });
 
@@ -198,7 +179,102 @@ router.get("/transactions/del", authMiddleware, async (request, response) => {
 
     return response.redirect("/transactions");
   } catch (error) {
-    console.log(error);
+    console.error(error);
+  }
+});
+
+router.get("/users", authMiddleware, async (request, response) => {
+  const { message } = request.session;
+
+  try {
+    let bitcoinBuy = await getBuy();
+
+    bitcoinBuy = new Intl.NumberFormat("pt-BR", {
+      style: "currency",
+      currency: "BRL"
+    }).format(bitcoinBuy);
+
+    const [rows] = await connection.query(
+      `SELECT * FROM users ORDER BY created_at ASC`
+    );
+
+    const users = rows.map(item => ({
+      ...item,
+      created_at: formatDateBR(item.created_at)
+    }));
+
+    return response.render("users", {
+      message,
+      users,
+      bitcoinBuy
+    });
+  } catch (error) {
+    console.error(error);
+  }
+});
+
+router.get("/users/add", authMiddleware, async (request, response) => {
+  try {
+    let bitcoinBuy = await getBuy();
+
+    bitcoinBuy = new Intl.NumberFormat("pt-BR", {
+      style: "currency",
+      currency: "BRL"
+    }).format(bitcoinBuy);
+
+    response.render("users_add", {
+      bitcoinBuy
+    });
+  } catch (error) {
+    console.error(error);
+  }
+});
+
+router.get("/users/edit", authMiddleware, async (request, response) => {
+  const { id } = request.query;
+
+  try {
+    let bitcoinBuy = await getBuy();
+
+    bitcoinBuy = new Intl.NumberFormat("pt-BR", {
+      style: "currency",
+      currency: "BRL"
+    }).format(bitcoinBuy);
+
+    const connection = await connect();
+
+    const [[row]] = await connection.query(`SELECT * FROM users WHERE id = ?`, [
+      id
+    ]);
+
+    const newData = {
+      ...row,
+      created_at: formatDate(row.created_at)
+    };
+
+    return response.render("users_edit", {
+      user: newData,
+      bitcoinBuy
+    });
+  } catch (error) {
+    console.error(error);
+  }
+});
+
+router.get("/users/del", authMiddleware, async (request, response) => {
+  let session = request.session;
+  const { id } = request.query;
+
+  try {
+    const connection = await connect();
+
+    await connection.query(`DELETE FROM users WHERE id = ?`, [id]);
+
+    session.message = "User deleted";
+
+    return response.redirect("/users");
+  } catch (error) {
+    console.error(error);
   }
 });
 

@@ -9,11 +9,11 @@ const transporter = mailer.createTransport({
   secure: process.env.MAILER_SECURE,
   auth: {
     user: process.env.MAILER_USER,
-    pass: process.env.MAILER_PASS,
+    pass: process.env.MAILER_PASS
   },
   tls: {
-    rejectUnauthorized: true,
-  },
+    rejectUnauthorized: true
+  }
 });
 
 const router = express.Router();
@@ -33,6 +33,7 @@ router.post("/login", async (request, response) => {
 
       if (row) {
         if (!bcrypt.compareSync(password, row.password)) {
+          console.log("error compare");
           session.message = "Could not find a user with these credentials";
           response.redirect("/");
           return;
@@ -120,7 +121,7 @@ router.post("/forgot", async (request, response) => {
           from: process.env.MAILER_FROM,
           to: row.email,
           subject: "Password recovery",
-          text: `Follow the link to recover your password, please login and follow the instructions: ${link}`,
+          text: `Follow the link to recover your password, please login and follow the instructions: ${link}`
         };
 
         transporter.sendMail(data, (error, info) => {

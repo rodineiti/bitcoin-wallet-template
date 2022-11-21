@@ -1,0 +1,53 @@
+<main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+  <div
+    class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom"
+  >
+    <h1 class="h2">Users</h1>
+
+  </div>
+  <div class="row">
+    <div class="col">
+
+      {{#if message}}
+        <div class="alert alert-info">{{message}}</div>
+      {{/if}}
+      <div class="row">
+        <div class="col-6">
+          <a href="/users/add" class="btn btn-primary text-right">Add user</a>
+        </div>
+        <div class="col-6 text-end">
+          <span class="badge bg-success">Current price bitcoin:
+            {{bitcoinBuy}}</span>
+        </div>
+      </div>
+      <hr />
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Name</th>
+            <th scope="col">Email</th>
+            <th scope="col">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{#each users}}
+            <tr>
+              <th scope="row">{{id}}</th>
+              <td>{{name}}</td>
+              <td>{{email}}</td>
+              <td>
+                <a href="/users/edit?id={{id}}" class="btn btn-info">Edit</a>
+                <a
+                  href="/users/del?id={{id}}"
+                  onclick="return confirm('Confirm ?'); return false;"
+                  class="btn btn-danger"
+                >Del</a>
+              </td>
+            </tr>
+          {{/each}}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</main>

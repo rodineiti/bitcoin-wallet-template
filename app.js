@@ -18,8 +18,8 @@ app.use(
     secret: process.env.SESSION_SECRET,
     cookie: {
       httpOnly: true,
-      maxAge: Date.now() + 30 * 86400 * 1000,
-    },
+      maxAge: Date.now() + 30 * 86400 * 1000
+    }
   })
 );
 
@@ -28,7 +28,7 @@ app.engine(
   exphbs({
     defaultLayout: "master",
     partialsDir: __dirname + "/views/partials",
-    extname: ".hbs",
+    extname: ".hbs"
   })
 );
 app.set("view engine", "hbs");
@@ -38,6 +38,7 @@ app.use("/", require("./src/routes/pages"));
 app.use("/auth", require("./src/routes/auth"));
 app.use("/authApi", require("./src/routes/authApi"));
 app.use("/transactions", require("./src/routes/transactions"));
+app.use("/users", require("./src/routes/users"));
 
 app.listen(9009, () => {
   console.log("Server running on port 9009");
